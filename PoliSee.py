@@ -139,8 +139,4 @@ def packageResultsCSV():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    t1 = process_time()
     packageResultsExcel()
-    t2 = process_time()
-    t = t2-t1
-    print(str(t) + "s")

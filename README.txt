@@ -9,7 +9,7 @@ First, let's get your version configured. In your default text editor (Notepad f
 	"memberFirstName": "[MEMBER FIRST NAME HERE]"
 }
 
-Please fill out this JSON file and save it as "creds.json". Here is how it should look before you press save:
+Please fill out this JSON file and save it as "creds.json" to the same folder. Here is how it should look before you press save:
 
 {
 	"congressNum": "117"
@@ -18,3 +18,6 @@ Please fill out this JSON file and save it as "creds.json". Here is how it shoul
 	"memberFirstName": "Brian"
 }
 
+Next, please ensure that you have Python 3 installed. To do this, you can go to your command line and run the following command:
+
+python --version

@@ -1,10 +1,7 @@
-from congress import Congress
 from bs4 import BeautifulSoup
 from urllib import request
-from time import process_time
 import csv
 import xlsxwriter as excel
-import sys
 #GLOBALS
 #Number of the current congress. E.G. "Nancy Pelosi is the speaker of the house
 #for the 117th congress"

@@ -6,8 +6,6 @@ import csv
 import xlsxwriter as excel
 import sys
 #GLOBALS
-#ProPublica Congressional API Key
-key = "5RnLVh2UJXE6htQSMktG8MsXbEkYeLXmLXwns9FJ"
 #Number of the current congress. E.G. "Nancy Pelosi is the speaker of the house
 #for the 117th congress"
 congressNum = "117"
@@ -16,8 +14,6 @@ memberID = "F000466"
 #Member name information
 memberLastName = "Fitzpatrick"
 memberFirstName = "Brian"
-#Sets global variable to store ProPublica Congressional API session
-congress = Congress(key)
 #Header to allow access to scrape congress.gov. DO NOT ALTER
 header = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) ' 
       'AppleWebKit/537.11 (KHTML, like Gecko) '

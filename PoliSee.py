@@ -49,7 +49,6 @@ def soupify():
     if numPages > 1:
         #Scrolls every page
         for i in range(1, numPages + 1):
-            print(i)
             #Accesses the current page number
             stock = request.Request(f"https://www.congress.gov/member/{memberFirstName}-{memberLastName}/{memberID}?s=1&r=7&q=%7B%22congress%22%3A%22{congressNum}%22%2C%22type%22%3A%22bills%22%7D&pageSize=100&page={i}", None, headers=header)
             #Opens and reads current page

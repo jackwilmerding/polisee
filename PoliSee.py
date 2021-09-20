@@ -5,7 +5,7 @@ import xlsxwriter as excel
 #GLOBALS
 #Number of the current congress. E.G. "Nancy Pelosi is the speaker of the house
 #for the 117th congress"
-congressNum = "117"
+congressNum = "116"
 #Hexadecimal Congressional Member ID (found in congressional bio URL on congress.gov)
 memberID = "F000466"
 #Member name information
@@ -34,8 +34,7 @@ def getNumPages():
     #exist, the program finds the number of pages and returns it. Otherwise, the returned
     #page number is 1
     try:
-        #TODO fix text indexing to handle multi-digit numbers of pages
-        return int(soup.find_all("span", class_="results-number")[1].text[4])
+        return int(soup.find_all("span", class_="results-number")[1].text[4:].strip(" "))
     except:
         return 1
 
@@ -50,6 +49,7 @@ def soupify():
     if numPages > 1:
         #Scrolls every page
         for i in range(1, numPages + 1):
+            print(i)
             #Accesses the current page number
             stock = request.Request(f"https://www.congress.gov/member/{memberFirstName}-{memberLastName}/{memberID}?s=1&r=7&q=%7B%22congress%22%3A%22{congressNum}%22%2C%22type%22%3A%22bills%22%7D&pageSize=100&page={i}", None, headers=header)
             #Opens and reads current page

@@ -5,7 +5,7 @@ import xlsxwriter as excel
 #GLOBALS
 #Number of the current congress. E.G. "Nancy Pelosi is the speaker of the house
 #for the 117th congress"
-congressNum = "116"
+congressNum = "117"
 #Hexadecimal Congressional Member ID (found in congressional bio URL on congress.gov)
 memberID = "F000466"
 #Member name information

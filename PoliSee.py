@@ -1,9 +1,12 @@
 from requests import *
 import pymongo
+import time
 
 key = ""
 congresses = [113, 114, 115, 116, 117]
 mongo = None
+db = None
+request_counter = 0
 
 class Member:
     def __init__(self, name: str, state : str, party: str):
@@ -26,15 +29,19 @@ class Database:
 
 def get_secrets(filename: str):
     with open(filename) as file:
-        key = file.readline()
-        username = file.readline()
-        password = file.readline()
-        cluster_name = file.readline()
-        #TODO FIX
+        global key
+        key = file.readline().strip("\n")
+        username = file.readline().strip("\n")
+        password = file.readline().strip("\n")
+        cluster_name = file.readline().strip("\n")
         mongo_uri = f'mongodb+srv://{username}:{password}@{cluster_name}.buaixd5.mongodb.net/?retryWrites=true&w=majority'
-        client = client = pymongo.MongoClient(mongo_uri)
+        global mongo
+        mongo = pymongo.MongoClient(mongo_uri)
+        global db
+        db = mongo.get_database("congresses")
 
 def get_bills(congress_number):
+    global request_counter
     params = {
         "api_key": key,
         "format": "json",
@@ -42,44 +49,65 @@ def get_bills(congress_number):
         "limit": 250
     }
     bills = []
-    url = f"https://api.congress.gov/v3/bill/{congress_number}"
+    url = f"https://api.congress.gov/v3/bill/{congress_number}/hr"
     response = get(url, params).json()
+    request_counter += 1
     while len(response["bills"]) != 0:
+        print(f"\rFetching House bills: {params['offset']}/{response['pagination']['count']}", end = "")
         response = get(url, params).json()
-        print(response)
+        request_counter += 1
+        bills.extend(response["bills"])
+        params["offset"] += 250
+    url = f"https://api.congress.gov/v3/bill/{congress_number}/s"
+    params["offset"] = 0
+    response = get(url, params).json()
+    request_counter += 1
+    while len(response["bills"]) != 0:
+        print(f"\rFetching Senate bills: {params['offset']}/{response['pagination']['count']}", end = "")
+        request_counter += 1
+        response = get(url, params).json()
         bills.extend(response["bills"])
         params["offset"] += 250
     return bills
 
 def init():
-    db = Database()
+    global request_counter
+    new_db = Database()
     params = {
         "api_key": key,
-        "format": "json",
+        "format": "json"
     }
-    for congress_number in congresses:
-        current_congress = db.congresses[congress_number]
+    #TODO FIX
+    for congress_number in [117]:
+        current_congress = new_db.congresses[congress_number]
         bills = get_bills(congress_number)
-        #for bill in bills:
-        for bill in bills[:5]:
+        ctr = 0
+        for bill in bills:
+            ctr += 1
+            print(f"\rProcessing bills: {ctr}/{len(bills)}; {request_counter} requests", end = "")
             bill_type = bill["type"]
             bill_number = bill["number"]
-            current_sponsor = get(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}", params)["sponsors"][0]
-            current_cosponsors = get(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}/cosponsors", params)["cosponsors"]
+            current_sponsor = get(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}", params).json()["bill"]["sponsors"][0]
+            current_cosponsors = get(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}/cosponsors", params).json()["cosponsors"]
+            request_counter += 2
             if bill_type == "S":
                 current_chamber = current_congress.senate
             elif bill_type == "HR":
                 current_chamber = current_congress.senate
-            if current_chamber.has_key(current_sponsor["bioguideId"]):
-                for cosponsor in current_cosponsors:
-                    if current_chamber[current_sponsor].colleagues.has_key(cosponsor["bioguideId"]):
-                        current_chamber[current_sponsor].colleagues[cosponsor["bioguideId"]] = 1
-                    else:
-                        current_chamber[current_sponsor].colleagues[cosponsor["bioguideId"]] += 1
-            else:
+            if current_sponsor["bioguideId"] not in current_chamber:
                 current_chamber[current_sponsor["bioguideId"]] = Member("Hon. " + current_sponsor["firstName"] + current_sponsor["lastName"], current_sponsor["state"], current_sponsor["party"])
-        #TODO UPLOAD CURRENT CONGRESS
+            for cosponsor in current_cosponsors:
+                if cosponsor["bioguideId"] not in current_chamber[current_sponsor["bioguideId"]].colleagues:
+                    current_chamber[current_sponsor["bioguideId"]].colleagues[cosponsor["bioguideId"]] = 1
+                else:
+                    current_chamber[current_sponsor["bioguideId"]].colleagues[cosponsor["bioguideId"]] += 1
 
 
 if __name__ == "__main__":
-    key = get_secrets("./secrets.txt")
+    start = time.time()
+    get_secrets("./secrets.txt")
+    try:
+        init()
+        print(time.time() - start)
+    except:
+        print(time.time() - start)

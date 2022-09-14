@@ -91,8 +91,8 @@ def update_node(congress_number: int, bioguide_id: str, first_name: str, last_na
     node_document = collection.find_one({"_id": bioguide_id})
     doc = {}
     doc["_id"] = bioguide_id
-    doc["first_name"] = first_name.capitalize()
-    doc["last_name"] = last_name.capitalize()
+    doc["first_name"] = first_name.upper()
+    doc["last_name"] = last_name.upper()
     doc["state"] = state.upper()
     doc["party"] = party[:1]
     doc["chamber"] = chamber

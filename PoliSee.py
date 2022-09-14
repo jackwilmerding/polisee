@@ -87,8 +87,8 @@ def update_edge(congress_number: int, from_node: str, to_node: str):
 
 #DONE
 def update_node(congress_number: int, bioguide_id: str, first_name: str, last_name: str, state: str, party: str, type: str):
-    collection = db[str(congress_number) + "_edges"]
-    edge_document = collection.find_one({"_id": bioguide_id})
+    collection = db[str(congress_number) + "_nodes"]
+    node_document = collection.find_one({"_id": bioguide_id})
     doc = {}
     doc["_id"] = bioguide_id
     doc["first_name"] = first_name.capitalize()
@@ -96,7 +96,7 @@ def update_node(congress_number: int, bioguide_id: str, first_name: str, last_na
     doc["state"] = state.upper()
     doc["party"] = party[:1]
     doc["type"] = type
-    if edge_document != None:
+    if node_document != None:
         collection.replace_one({"_id": bioguide_id}, doc)
     else:
         collection.insert_one(doc)

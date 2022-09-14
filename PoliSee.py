@@ -28,6 +28,8 @@ def get_secrets(filename: str):
 
 #DONE
 def get_until_success(endpoint, params):
+    global request_counter
+    request_counter += 1
     req = get(endpoint, params)
     while req.status_code != 200:
         time.sleep(60)
@@ -38,7 +40,6 @@ def get_until_success(endpoint, params):
 
 #DONE
 def get_bills(congress_number):
-    global request_counter
     params = {
         "api_key": key,
         "format": "json",
@@ -53,7 +54,6 @@ def get_bills(congress_number):
         bills.extend(response["bills"])
         print(f"\rFetching House bills: {params['offset']}/{response['pagination']['count']}", end = "")
         response = get_until_success(url, params)
-        request_counter += 1
         params["offset"] += 250
     url = f"https://api.congress.gov/v3/bill/{congress_number}/s"
     params["offset"] = 0
@@ -62,7 +62,6 @@ def get_bills(congress_number):
     while len(response["bills"]) != 0:
         bills.extend(response["bills"])
         print(f"\rFetching Senate bills: {params['offset']}/{response['pagination']['count']}", end = "")
-        request_counter += 1
         response = get_until_success(url, params)
         params["offset"] += 250
     return bills
@@ -104,7 +103,6 @@ def update_node(congress_number: int, bioguide_id: str, first_name: str, last_na
 
 #DONE
 def get_bill_info(bill, congress_number):
-    global request_counter
     params = {
         "api_key": key,
         "format": "json"
@@ -117,7 +115,6 @@ def get_bill_info(bill, congress_number):
         current_sponsor["chamber"] = "Senate"
     elif bill_type == "HR":
         current_sponsor["chamber"] = "House of Representatives"
-    request_counter += 2
     return current_sponsor, current_cosponsors
 
 #DONE

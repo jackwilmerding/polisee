@@ -36,9 +36,9 @@ def get_until_success(endpoint, params):
     print(req)
     while req.status_code != 200:
         print(f"Error Fetching following endpoint: {endpoint}")
-        time.sleep(60)
+        time.sleep(300)
         req = get(endpoint, params)
-    time.sleep(1.2)
+    time.sleep(1.4)
     return req.json()
 
 

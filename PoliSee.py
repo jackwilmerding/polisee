@@ -10,32 +10,7 @@ db = None
 collection = None
 request_counter = 0
 
-class Member:
-    def __init__(self, bioguide_id: str, name: str, state : str, party: str, type: str):
-        self.bioguide_id = bioguide_id
-        self.name = name
-        self.state = state
-        self.party = party[:1]
-        self.colleagues = {}
-        self.type = type
-    def pack(self):
-        packed = {}
-        packed["_id"] = self.bioguide_id
-        packed["name"] = self.name
-        packed["state"] = self.state
-        packed["party"] = self.party
-        packed["colleagues"] = self.colleagues
-        return packed
 
-class Congress:
-    def __init__(self, congress_number: int):
-        self.congress_number = congress_number
-        self.members = {}
-    def pack(self):
-        packed = []
-        for member in self.members:
-            packed.append(self.members[member].pack())
-        return packed
 #DONE
 def get_secrets(filename: str):
     with open(filename) as file:
@@ -49,6 +24,8 @@ def get_secrets(filename: str):
         mongo = pymongo.MongoClient(mongo_uri)
         global db
         db = mongo.PoliSee
+
+
 #DONE
 def get_until_success(endpoint, params):
     req = get(endpoint, params)
@@ -57,6 +34,8 @@ def get_until_success(endpoint, params):
         req = get(endpoint, params).json()
     time.sleep(1.2)
     return(req.json())
+
+
 #DONE
 def get_bills(congress_number):
     global request_counter
@@ -89,17 +68,48 @@ def get_bills(congress_number):
         params["offset"] += 250
     return bills
 
+
+#DONE
+def update_edge(congress_number: int, from_node: str, to_node: str):
+    collection = db[str(congress_number) + "_edges"]
+    edge_document = collection.find_one({"$and": [{"from_node": from_node}, {"to_node": to_node}]})
+    if edge_document != None:
+        current_count = edge_document["count"]
+        collection.update_one({"$and": [{"from_node": from_node}, {"to_node": to_node}]}, {"$set": {"count" : current_count + 1}})
+    else:
+        doc = {}
+        doc["_id"] = from_node + "," + to_node
+        doc["from_node"] = from_node
+        doc["to_node"] = to_node
+        doc["count"] = 1
+        collection.insert_one(doc)
+
+
+#DONE
+def update_node(congress_number: int, bioguide_id: str, first_name: str, last_name: str, state: str, party: str, type: str):
+    collection = db[str(congress_number) + "_edges"]
+    edge_document = collection.find_one({"_id": bioguide_id})
+    doc = {}
+    doc["_id"] = bioguide_id
+    doc["first_name"] = first_name.capitalize()
+    doc["last_name"] = last_name.capitalize()
+    doc["state"] = state.upper()
+    doc["party"] = party[:1]
+    doc["type"] = type
+    if edge_document != None:
+        collection.replace_one({"_id": bioguide_id}, doc)
+    else:
+        collection.insert_one(doc)
+
+
 def init():
     global request_counter
-    global collection
     params = {
         "api_key": key,
         "format": "json"
     }
     #TODO CLEAN UP
     for congress_number in congresses:
-        collection = db[str(congress_number)]
-        current_congress = Congress(congress_number)
         bills = get_bills(congress_number)
         ctr = 0
         for bill in bills[0:5]:
@@ -127,10 +137,4 @@ def init():
 if __name__ == "__main__":
     start = time.time()
     get_secrets("./secrets.txt")
-    try:
-        init()
-        print(time.time() - start)
-    except Exception as e:
-        print()
-        print(e)
-        print(time.time() - start)
+    update_edge(117, "12244l", "sdafdas")

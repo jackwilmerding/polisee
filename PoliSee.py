@@ -49,21 +49,19 @@ def get_bills(congress_number):
     bills = []
     url = f"https://api.congress.gov/v3/bill/{congress_number}/hr"
     response = get_until_success(url, params)
-    request_counter += 1
     while len(response["bills"]) != 0:
         bills.extend(response["bills"])
         print(f"\rFetching House bills: {params['offset']}/{response['pagination']['count']}", end = "")
-        response = get_until_success(url, params)
         params["offset"] += 250
+        response = get_until_success(url, params)
     url = f"https://api.congress.gov/v3/bill/{congress_number}/s"
     params["offset"] = 0
     response = get_until_success(url, params)
-    request_counter += 1
     while len(response["bills"]) != 0:
         bills.extend(response["bills"])
         print(f"\rFetching Senate bills: {params['offset']}/{response['pagination']['count']}", end = "")
-        response = get_until_success(url, params)
         params["offset"] += 250
+        response = get_until_success(url, params)
     return bills
 
 

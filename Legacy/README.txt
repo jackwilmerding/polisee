@@ -4,7 +4,7 @@ First, let's get your version configured. In your default text editor (Notepad f
 
 {
 	"congressNum": "[CONGRESS NUMBER HERE]"
-	"memberID": "[HEXADECIMAL CODE HERE]"
+	"memberID": "[MEMBER CODE HERE]"
 	"memberLastName": "[MEMBER LAST NAME HERE]"
 	"memberFirstName": "[MEMBER FIRST NAME HERE]"
 }

@@ -4,7 +4,6 @@ import time
 
 key = ""
 #TODO Expand for production
-congresses = [116]
 mongo = None
 db = None
 collection = None

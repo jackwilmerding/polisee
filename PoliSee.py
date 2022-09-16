@@ -31,10 +31,8 @@ def get_until_success(endpoint, params):
     global request_counter
     request_counter += 1
     req = get(endpoint, params)
-    print(endpoint)
-    print(req.text)
-    print(req)
     while req.status_code != 200:
+        print()
         print(f"Error Fetching following endpoint: {endpoint}")
         time.sleep(300)
         req = get(endpoint, params)
@@ -109,7 +107,7 @@ def get_bill_info(bill, congress_number):
         "api_key": key,
         "format": "json"
     }
-    bill_type = bill["type"]
+    bill_type = bill["type"].upper()
     bill_number = bill["number"]
     current_sponsor = get_until_success(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}", params)["bill"]["sponsors"][0]
     current_cosponsors = get_until_success(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}/cosponsors", params)["cosponsors"]
@@ -136,4 +134,6 @@ def get_congress_data(congress_number):
 if __name__ == "__main__":
     start = time.time()
     get_secrets("./secrets.txt")
-    get_congress_data(116)
+    get_congress_data(115)
+    get_congress_data(114)
+    get_congress_data(113)

@@ -3,3 +3,6 @@
 /*.xlsx
 /*.csv
 /secrets.txt
+
+node_modules/
+cache/

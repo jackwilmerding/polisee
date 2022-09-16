@@ -4,7 +4,6 @@ import time
 
 key = ""
 #TODO Expand for production
-congresses = [116]
 mongo = None
 db = None
 collection = None
@@ -31,10 +30,8 @@ def get_until_success(endpoint, params):
     global request_counter
     request_counter += 1
     req = get(endpoint, params)
-    print(endpoint)
-    print(req.text)
-    print(req)
     while req.status_code != 200:
+        print()
         print(f"Error Fetching following endpoint: {endpoint}")
         time.sleep(300)
         req = get(endpoint, params)
@@ -102,6 +99,19 @@ def update_node(congress_number: int, bioguide_id: str, first_name: str, last_na
     else:
         collection.insert_one(doc)
 
+def clean_unpaired_IDs(congress_number: int):
+    params = {
+        "api_key": key,
+        "format": "json"
+    }
+    edges = db[str(congress_number) + "_edges"].find()
+    for edge in edges:
+        node_document = collection.find_one({"_id": edge["to_node"]})
+        if node_document == None:
+            member = get_until_success(f"https://api.congress.gov/v3/member/{edge['to_node']}", params)
+            update_node(congress_number, edge["to_node"], member["firstName"], member["lastName"], member["state"], member["partyName"], edge["chamber"])
+            print("Added missing member")
+
 
 #DONE
 def get_bill_info(bill, congress_number):
@@ -109,7 +119,7 @@ def get_bill_info(bill, congress_number):
         "api_key": key,
         "format": "json"
     }
-    bill_type = bill["type"]
+    bill_type = bill["type"].upper()
     bill_number = bill["number"]
     current_sponsor = get_until_success(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}", params)["bill"]["sponsors"][0]
     current_cosponsors = get_until_success(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}/cosponsors", params)["cosponsors"]
@@ -136,4 +146,6 @@ def get_congress_data(congress_number):
 if __name__ == "__main__":
     start = time.time()
     get_secrets("./secrets.txt")
-    get_congress_data(116)
+    get_congress_data(115)
+    get_congress_data(114)
+    get_congress_data(113)

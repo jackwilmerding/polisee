@@ -99,6 +99,19 @@ def update_node(congress_number: int, bioguide_id: str, first_name: str, last_na
     else:
         collection.insert_one(doc)
 
+def clean_unpaired_IDs(congress_number: int):
+    params = {
+        "api_key": key,
+        "format": "json"
+    }
+    edges = db[str(congress_number) + "_edges"].find()
+    for edge in edges:
+        node_document = collection.find_one({"_id": edge["to_node"]})
+        if node_document == None:
+            member = get_until_success(f"https://api.congress.gov/v3/member/{edge['to_node']}", params)
+            update_node(congress_number, edge["to_node"], member["firstName"], member["lastName"], member["state"], member["partyName"], edge["chamber"])
+            print("Added missing member")
+
 
 #DONE
 def get_bill_info(bill, congress_number):

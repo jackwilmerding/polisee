@@ -3,7 +3,6 @@ import pymongo
 import time
 
 key = ""
-# TODO Expand for production
 mongo = None
 db = None
 request_counter = 0
@@ -73,23 +72,19 @@ def update_edge(congress_number: int, from_node: str, to_node: str, chamber: str
         current_count = edge_document["count"]
         collection.update_one({"$and": [{"from_node": from_node}, {"to_node": to_node}, {"chamber": chamber}]}, {"$set": {"count": current_count + 1}})
     else:
-        doc = {"_id": from_node + "," + to_node, "from_node": from_node, "to_node": to_node, "chamber": chamber,
-               "count": 1}
+        doc = {"_id": from_node + "," + to_node, "from_node": from_node, "to_node": to_node, "chamber": chamber, "count": 1}
         collection.insert_one(doc)
 
 
 # DONE
-def update_node(congress_number: int, bioguide_id: str, first_name: str, last_name: str, state: str, party: str,
-                chamber: str):
+def update_node(congress_number: int, bioguide_id: str, first_name: str, last_name: str, state: str, party: str, chamber: str):
     collection = db[str(congress_number) + "_nodes"]
     node_document = collection.find_one({"_id": bioguide_id})
     if node_document is not None:
         incremented_sponsorships = node_document["sponsorships"] + 1
-        collection.update_one_one({"_id": bioguide_id},
-                                  {"$set": {"sponsorships_this_congress": incremented_sponsorships}})
+        collection.update_one_one({"_id": bioguide_id}, {"$set": {"sponsorships_this_congress": incremented_sponsorships}})
     else:
-        doc = {"_id": bioguide_id, "first_name": first_name.upper(), "last_name": last_name.upper(),
-               "state": state.upper(), "party": party[:1], "chamber": chamber, "sponsorships_this_congress": 1}
+        doc = {"_id": bioguide_id, "first_name": first_name.upper(), "last_name": last_name.upper(), "state": state.upper(), "party": party[:1], "chamber": chamber, "sponsorships_this_congress": 1}
         collection.insert_one(doc)
 
 
@@ -266,3 +261,5 @@ if __name__ == "__main__":
     clean_unpaired_ids(115)
     fix_sponsorless_congress(115)
     fix_sponsorless_congress(116)
+    augment_existing_nodes(115)
+    augment_existing_nodes(116)

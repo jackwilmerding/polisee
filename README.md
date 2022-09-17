@@ -1,5 +1,5 @@
 <h1 align="center">Poli See</h1>
-<p align="center">Poli See is a 3D graph of representation of congressional voting data from <a href="https://api.congress.gov/">api.congress.gov</a></p>
+<p align="center">Poli See is a 3D graph of representation of congressional cosponsorship data from <a href="https://api.congress.gov/">api.congress.gov</a></p>
 
 ## Usage
 

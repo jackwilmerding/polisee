@@ -104,13 +104,15 @@ def clean_unpaired_IDs(congress_number: int):
         "api_key": key,
         "format": "json"
     }
-    edges = db[str(congress_number) + "_edges"].find()
-    for edge in edges:
-        node_document = collection.find_one({"_id": edge["to_node"]})
+    edges = db[str(congress_number) + "_edges"]
+    nodes = db[str(congress_number) + "_nodes"]
+    for edge in edges.find():
+        node_document = nodes.find_one({"_id": edge["to_node"]})
         if node_document == None:
-            member = get_until_success(f"https://api.congress.gov/v3/member/{edge['to_node']}", params)
-            update_node(congress_number, edge["to_node"], member["firstName"], member["lastName"], member["state"], member["partyName"], edge["chamber"])
-            print("Added missing member")
+            member = get_until_success(f"https://api.congress.gov/v3/member/{edge['to_node']}", params)["member"]
+            print(f"Adding {member['firstName']} {member['lastName']}")
+            update_node(congress_number, edge["to_node"], member["firstName"], member["lastName"], member["state"], member["party"], edge["chamber"])
+            print("SUCCESS: Added missing member")
 
 
 #DONE
@@ -141,11 +143,8 @@ def get_congress_data(congress_number):
         for cosponsor in current_cosponsors:
             update_node(congress_number, current_sponsor["bioguideId"], current_sponsor["firstName"], current_sponsor["lastName"], current_sponsor["state"], current_sponsor["party"], current_sponsor["chamber"])
             update_edge(congress_number, current_sponsor["bioguideId"], cosponsor["bioguideId"], current_sponsor["chamber"])
+    clean_unpaired_IDs(congress_number)
 
 
 if __name__ == "__main__":
-    start = time.time()
     get_secrets("./secrets.txt")
-    get_congress_data(115)
-    get_congress_data(114)
-    get_congress_data(113)

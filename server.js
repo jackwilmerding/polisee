@@ -81,6 +81,8 @@ const getCongress = async (congressNumber) => {
   return url;
 };
 
+app.use(express.static(path.join(__dirname, "client/dist")));
+
 app.get("/api/:congressNumber", compression(), async (req, res) => {
   const congressNumber = req.params.congressNumber;
   const url = await getCongress(congressNumber);

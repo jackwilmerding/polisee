@@ -249,14 +249,14 @@ def fix_sponsorless_congress(congress_number: int):
         bill_number = bill["number"]
         current_sponsor = get_until_success(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}", params)["bill"]["sponsors"][0]
         current_node = nodes.find_one({"_id": current_sponsor["bioguideId"]})
+        if current_node is None:
+            continue
         current_sponsorships = current_node["sponsorships_this_congress"] + 1
-        nodes.update_one({"_id": current_sponsor["bioguideId"]},
-                         {"$set": {"sponsorships_this_congress": current_sponsorships}})
+        nodes.update_one({"_id": current_sponsor["bioguideId"]}, {"$set": {"sponsorships_this_congress": current_sponsorships}})
         ctr += 1
         print(f"\rFixing nodes: {ctr}/{len(bills)} of the way there; {request_counter} requests", end="")
 
 
 if __name__ == "__main__":
     get_secrets("./secrets.txt")
-    clean_unpaired_ids(115)
     fix_sponsorless_congress(115)

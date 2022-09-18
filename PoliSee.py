@@ -67,7 +67,7 @@ def get_bills(congress_number):
 # DONE
 def update_edge(congress_number: int, from_node: str, to_node: str, chamber: str):
     collection = db[str(congress_number) + "_edges"]
-    edge_document = collection.find_one({"$and": [{"from_node": from_node}, {"to_node": to_node}]})
+    edge_document = collection.find_one({"$and": [{"from_node": from_node}, {"to_node": to_node}, {"chamber": chamber}]})
     if edge_document is not None:
         current_count = edge_document["count"]
         collection.update_one({"$and": [{"from_node": from_node}, {"to_node": to_node}, {"chamber": chamber}]}, {"$set": {"count": current_count + 1}})

@@ -210,11 +210,23 @@ def get_bill_info(bill: dict, congress_number: int):
     bill_type = bill["type"].upper()
     bill_number = bill["number"]
     current_sponsor = get_until_success(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}", params)["bill"]["sponsors"][0]
-    current_cosponsors = get_until_success(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}/cosponsors", params)["cosponsors"]
     if bill_type == "S":
         current_sponsor["chamber"] = "Senate"
     elif bill_type == "HR":
         current_sponsor["chamber"] = "House of Representatives"
+    params = {
+        "api_key": key,
+        "format": "json",
+        "offset": 0,
+        "limit": 250
+    }
+    current_cosponsors = []
+    url = f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}/cosponsors"
+    response = get_until_success(url, params)
+    while len(response["cosponsors"]) != 0:
+        current_cosponsors.extend(response["cosponsors"])
+        params["offset"] += 250
+        response = get_until_success(url, params)
     return current_sponsor, current_cosponsors
 
 
@@ -264,6 +276,4 @@ def fix_sponsorless_congress(congress_number: int):
 
 if __name__ == "__main__":
     get_secrets("./secrets.txt")
-    augment_existing_nodes(115)
-    fix_sponsorless_congress(116)
-    augment_existing_nodes(116)
+    get_congress_data(115)

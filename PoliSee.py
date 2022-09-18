@@ -238,9 +238,6 @@ def get_congress_data(congress_number: int):
         print(f"\rProcessing bills: {ctr}/{len(bills)}; {request_counter} requests", end="")
         current_sponsor, current_cosponsors = get_bill_info(bill, congress_number)
         for cosponsor in current_cosponsors:
-            update_node(congress_number, current_sponsor["bioguideId"], current_sponsor["firstName"],
-                        current_sponsor["lastName"], current_sponsor["state"], current_sponsor["party"],
-                        current_sponsor["chamber"])
             update_edge(congress_number, current_sponsor["bioguideId"], cosponsor["bioguideId"],
                         current_sponsor["chamber"])
     clean_unpaired_ids(congress_number)
@@ -274,4 +271,11 @@ def fix_sponsorless_congress(congress_number: int):
 
 if __name__ == "__main__":
     get_secrets("./secrets.txt")
+    augment_existing_nodes(116)
     get_congress_data(115)
+    db.drop_collection("116_nodes")
+    db.drop_collection("116_edges")
+    get_congress_data(116)
+    get_congress_data(114)
+    get_congress_data(113)
+    get_congress_data(112)

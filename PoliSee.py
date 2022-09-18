@@ -190,10 +190,10 @@ def augment_existing_nodes(congress_number: int):
         print(f"Augmented {ctr} nodes")
     for node in nodes.find():
         member = get_until_success(f"https://api.congress.gov/v3/member/{node['_id']}", params)["member"]
-        new_fields = {"image_link": member["depiction"]["imageUrl"],
-                      "prolific_rank": get_prolific_rank(congress_number, node["_id"]),
+        new_fields = {"prolific_rank": get_prolific_rank(congress_number, node["_id"]),
                       "collaborative_rank": get_collaborative_rank(congress_number, node["_id"]),
-                      "bipartisan_rank": get_bipartisan_rank(congress_number, node["_id"])}
+                      "bipartisan_rank": get_bipartisan_rank(congress_number, node["_id"]),
+                      "image_link": member["depiction"]["imageUrl"]}
         nodes.update_one({"_id": node["_id"]}, {"$set": new_fields})
         ctr += 0.5
         print(f"Augmented {ctr} nodes")

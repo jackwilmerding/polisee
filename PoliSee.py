@@ -275,6 +275,7 @@ def fix_sponsorless_congress(congress_number: int):
 
 if __name__ == "__main__":
     get_secrets("./secrets.txt")
+    augment_existing_nodes(116)
     db.drop_collection("115_nodes")
     db.drop_collection("115_edges")
     get_congress_data(115)

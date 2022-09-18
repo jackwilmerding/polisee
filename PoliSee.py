@@ -212,6 +212,9 @@ def get_bill_info(bill: dict, congress_number: int):
         current_sponsor["chamber"] = "Senate"
     elif bill_type == "HR":
         current_sponsor["chamber"] = "House of Representatives"
+    #Fixes J. Gresham Barrett-style names from just being J. Barrett
+    if len(current_sponsor["firstName"]) == 2 and current_sponsor["firstName"][1] == ".":
+        current_sponsor["firstName"] += current_sponsor["middleName"]
     params = {
         "api_key": key,
         "format": "json",
@@ -240,6 +243,7 @@ def get_congress_data(congress_number: int):
         for cosponsor in current_cosponsors:
             update_edge(congress_number, current_sponsor["bioguideId"], cosponsor["bioguideId"],
                         current_sponsor["chamber"])
+        update_node(117, current_sponsor["bioguideId"], current_sponsor["firstName"], current_sponsor["lastName"], current_sponsor["state"], current_sponsor["party"], current_sponsor["chamber"])
     clean_unpaired_ids(congress_number)
     augment_existing_nodes(congress_number)
 
@@ -273,7 +277,6 @@ if __name__ == "__main__":
     get_secrets("./secrets.txt")
     db.drop_collection("115_nodes")
     db.drop_collection("115_edges")
-    augment_existing_nodes(116)
     get_congress_data(115)
     db.drop_collection("116_nodes")
     db.drop_collection("116_edges")

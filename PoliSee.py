@@ -69,8 +69,7 @@ def update_edge(congress_number: int, from_node: str, to_node: str, chamber: str
     collection = db[str(congress_number) + "_edges"]
     edge_document = collection.find_one({"$and": [{"from_node": from_node}, {"to_node": to_node}, {"chamber": chamber}]})
     if edge_document is not None:
-        current_count = edge_document["count"]
-        collection.update_one({"$and": [{"from_node": from_node}, {"to_node": to_node}, {"chamber": chamber}]}, {"$set": {"count": current_count + 1}})
+        collection.update_one({"$and": [{"from_node": from_node}, {"to_node": to_node}, {"chamber": chamber}]}, {"$inc": {"count": 1}})
     else:
         doc = {"_id": from_node + "," + to_node, "from_node": from_node, "to_node": to_node, "chamber": chamber, "count": 1}
         collection.insert_one(doc)
@@ -81,8 +80,7 @@ def update_node(congress_number: int, bioguide_id: str, first_name: str, last_na
     collection = db[str(congress_number) + "_nodes"]
     node_document = collection.find_one({"_id": bioguide_id})
     if node_document is not None:
-        incremented_sponsorships = node_document["sponsorships"] + 1
-        collection.update_one_one({"_id": bioguide_id}, {"$set": {"sponsorships_this_congress": incremented_sponsorships}})
+        collection.update_one({"_id": bioguide_id}, {"$inc": {"sponsorships_this_congress": 1}})
     else:
         doc = {"_id": bioguide_id, "first_name": first_name.upper(), "last_name": last_name.upper(), "state": state.upper(), "party": party[:1], "chamber": chamber, "sponsorships_this_congress": 1}
         collection.insert_one(doc)

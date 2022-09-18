@@ -182,17 +182,22 @@ def augment_existing_nodes(congress_number: int):
         "format": "json"
     }
     nodes = db[str(congress_number) + "_nodes"]
+    nodes.update_many({}, {"$set": {"cosponsorships_this_congress": 0}})
+    nodes.update_many({}, {"$set": {"aisle_crosses_this_congress": 0}})
     ctr = 0
+    for node in nodes.find():
+        new_fields = {"cosponsorships_this_congress": get_num_cosponsorships(congress_number, node["_id"]), "aisle_crosses_this_congress": get_num_aisle_crosses(congress_number, node["_id"])}
+        nodes.update_one({"_id": node["_id"]}, {"$set": new_fields})
+        ctr += 0.5
+        print(f"Augmented {ctr} nodes")
     for node in nodes.find():
         member = get_until_success(f"https://api.congress.gov/v3/member/{node['_id']}", params)["member"]
         new_fields = {"image_link": member["depiction"]["imageUrl"],
-                      "cosponsorships_this_congress": get_num_cosponsorships(congress_number, node["_id"]),
                       "prolific_rank": get_prolific_rank(congress_number, node["_id"]),
                       "collaborative_rank": get_collaborative_rank(congress_number, node["_id"]),
-                      "aisle_crosses_this_congress": get_num_aisle_crosses(congress_number, node["_id"]),
                       "bipartisan_rank": get_bipartisan_rank(congress_number, node["_id"])}
         nodes.update_one({"_id": node["_id"]}, {"$set": new_fields})
-        ctr += 1
+        ctr += 0.5
         print(f"Augmented {ctr} nodes")
 
 

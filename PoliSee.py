@@ -243,7 +243,7 @@ def get_congress_data(congress_number: int):
         for cosponsor in current_cosponsors:
             update_edge(congress_number, current_sponsor["bioguideId"], cosponsor["bioguideId"],
                         current_sponsor["chamber"])
-        update_node(117, current_sponsor["bioguideId"], current_sponsor["firstName"], current_sponsor["lastName"], current_sponsor["state"], current_sponsor["party"], current_sponsor["chamber"])
+        update_node(congress_number, current_sponsor["bioguideId"], current_sponsor["firstName"], current_sponsor["lastName"], current_sponsor["state"], current_sponsor["party"], current_sponsor["chamber"])
     clean_unpaired_ids(congress_number)
     augment_existing_nodes(congress_number)
 

@@ -259,4 +259,6 @@ def fix_sponsorless_congress(congress_number: int):
 
 if __name__ == "__main__":
     get_secrets("./secrets.txt")
-    fix_sponsorless_congress(115)
+    augment_existing_nodes(115)
+    fix_sponsorless_congress(116)
+    augment_existing_nodes(116)

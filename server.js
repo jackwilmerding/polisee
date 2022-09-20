@@ -42,25 +42,29 @@ const getCongress = async (congressNumber) => {
     _id: node._id.toString(),
     firstName: node["first_name"],
     lastName: node["last_name"],
+    imageUrl: node["image_link"],
     state: node["state"],
     party: node["party"],
-    group: node["party"] === "D" ? 1 : node["party"] === "R" ? 2 : 3,
+    // this line might be bad lol
+    chamber: node["chamber"] === "Senate" ? "senate" : "house",
   }));
 
   //console.table(nodes);
 
-  const edges = (
+  const links = (
     await db.collection(`${congressNumber}_edges`).find().toArray()
   ).map((node) => ({
     source: node["from_node"],
     target: node["to_node"],
-    charge: node["count"],
+    value: node["count"],
+    chamber: node["chamber"] === "Senate" ? "senate" : "house",
   }));
 
   /// bad zone!!!!
   // 🚨🚨🚨
   //TODO: GET RID OF THIS AND RESET CACHE!!!!!
 
+  /*
   for (let i = 0; i < edges.length; i++) {
     const edge = edges[i];
 
@@ -74,16 +78,16 @@ const getCongress = async (congressNumber) => {
       i--;
     }
   }
-
+  */
   ///!!!!! BAD!!
 
-  fs.writeFileSync(url, JSON.stringify({ nodes, edges }), { flag: "w" });
+  fs.writeFileSync(url, JSON.stringify({ nodes, links }), { flag: "w" });
   return url;
 };
 
 app.use(express.static(path.join(__dirname, "client/dist")));
 
-app.get("/api/:congressNumber", compression(), async (req, res) => {
+app.get("/api/congress/:congressNumber", compression(), async (req, res) => {
   const congressNumber = req.params.congressNumber;
   const url = await getCongress(congressNumber);
 

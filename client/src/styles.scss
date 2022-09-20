@@ -2,3 +2,43 @@ body,
 html {
   margin: 0;
 }
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+#root {
+  position: absolute;
+}
+
+.nav {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  width: 100%;
+  padding: 4pt;
+  //border: 1px solid green;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-content: center;
+}
+
+.nav-left {
+  width: fit-content;
+}
+
+.nav-right {
+  width: fit-content;
+  justify-self: end;
+}
+
+.nav-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

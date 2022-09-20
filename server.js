@@ -1,7 +1,6 @@
 import express from "express";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
-import compression from "compression";
 
 import { MongoClient } from "mongodb";
 import path, { dirname } from "path";
@@ -18,12 +17,13 @@ const client = new MongoClient(process.env.MONGO_URI, {
 const port = process.env.PORT || 3000;
 const app = express();
 
-await client.connect();
-console.log("Connected to MongoDB");
-
-const db = client.db("PoliSee");
+const getDb = async () => {
+  await client.connect();
+  return client.db("PoliSee");
+};
 
 const getCongress = async (congressNumber) => {
+  const db = await getDb();
   const url = `cache/${congressNumber}.json`;
   if (fs.existsSync(url)) {
     console.log(`Cache hit! Serving ${url}`);
@@ -85,13 +85,71 @@ const getCongress = async (congressNumber) => {
   return url;
 };
 
-app.use(express.static(path.join(__dirname, "client/dist")));
+// Express land
 
-app.get("/api/congress/:congressNumber", compression(), async (req, res) => {
+app.use(express.static(path.join(__dirname, "client/dist")));
+app.use(express.json());
+
+app.get("/api/congress/:congressNumber", async (req, res) => {
   const congressNumber = req.params.congressNumber;
   const url = await getCongress(congressNumber);
 
   res.sendFile(path.join(__dirname, url));
+});
+
+app.post("/api/congress/:congressNumber/search", async (req, res) => {
+  const db = await getDb();
+  const { text } = req.body;
+  if (!text) {
+    res.status(400).end();
+    return;
+  }
+
+  console.log(`Searching for ${text}`);
+  const results = await db
+    .collection(`${req.params.congressNumber}_nodes`)
+    .aggregate([
+      {
+        $search: {
+          index: `${req.params.congressNumber}_search`,
+          text: {
+            query: text,
+            fuzzy: {},
+            path: {
+              wildcard: "*",
+            },
+          },
+        },
+      },
+
+      { $limit: 8 },
+      {
+        $project: {
+          _id: 1,
+          first_name: 1,
+          last_name: 1,
+          state: 1,
+          party: 1,
+          chamber: 1,
+          score: { $meta: "searchScore" },
+        },
+      },
+    ])
+    .toArray();
+
+  for (const result of results) {
+    // Rename result fields to comply with client conventions
+    result.firstName = result.first_name;
+    result.lastName = result.last_name;
+
+    delete result.first_name;
+    delete result.last_name;
+
+    result.chamber = result.chamber === "Senate" ? "senate" : "house";
+  }
+  console.table(results);
+
+  res.json(results);
 });
 
 app.listen(port, () => {

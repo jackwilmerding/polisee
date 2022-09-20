@@ -37,9 +37,10 @@ const NavBar = () => {
       <div className="nav-right">
         <select
           className="form-select"
-          defaultValue={116}
+          value={congressNumber}
           onChange={(e) => {
             console.log(e.currentTarget.value);
+            e.preventDefault();
             setCongressNumber(e.currentTarget.value);
           }}
         >

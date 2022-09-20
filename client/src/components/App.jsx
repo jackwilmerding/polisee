@@ -9,7 +9,7 @@ const App = () => {
   const [graphData, setGraphData] = useState(null);
 
   const [chamber, setChamber] = useState("house");
-  const [congressNumber, setCongressNumber] = useState(116);
+  const [congressNumber, setCongressNumber] = useState(115);
 
   const [focusedMember, setFocusedMember] = useState(null);
 

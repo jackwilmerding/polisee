@@ -15,9 +15,8 @@ const colorMap = {
 };
 
 const Graph = () => {
-  const { graphData, chamber, focusedMember } = useContext(AppStateContext);
-
-  const [graphType, setGraphType] = useState("3D");
+  const { graphData, graphType, chamber, focusedMember } =
+    useContext(AppStateContext);
 
   useEffect(() => {
     console.log(`✅ UseEffect detected new focused member: ${focusedMember}`);
@@ -37,6 +36,7 @@ const Graph = () => {
       nodeColor: (node) => colorMap[node.party] || "green",
       nodeLabel: (node) => `${node.firstName} ${node.lastName}`,
       nodeVisibility: (node) => node.chamber === chamber,
+      showNavInfo: false,
       linkOpacity: 0.1,
     };
   };
@@ -60,35 +60,6 @@ const Graph = () => {
           )}
         </div>
       )}
-      <div className="btn-group graph-viewmode-selector">
-        <button
-          type="button"
-          className={
-            graphType === "2D" ? "btn btn-primary" : "btn btn-outline-primary"
-          }
-          onClick={() => setGraphType("2D")}
-        >
-          2D
-        </button>
-        <button
-          type="button"
-          className={
-            graphType === "3D" ? "btn btn-primary" : "btn btn-outline-primary"
-          }
-          onClick={() => setGraphType("3D")}
-        >
-          3D
-        </button>
-        <button
-          type="button"
-          className={
-            graphType === "VR" ? "btn btn-primary" : "btn btn-outline-primary"
-          }
-          onClick={() => setGraphType("VR")}
-        >
-          VR
-        </button>
-      </div>
     </>
   );
 };

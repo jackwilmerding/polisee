@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import loadCongress from "../scripts/loadCongress";
 import Graph from "./Graph";
-import NavBar from "./NavBar";
+import Search from "./Search";
+import ControlPanel from "./ControlPanel";
 
 export const AppStateContext = React.createContext({});
 
 const App = () => {
   const [graphData, setGraphData] = useState(null);
+  const [graphType, setGraphType] = useState("3D");
 
   const [chamber, setChamber] = useState("house");
   const [congressNumber, setCongressNumber] = useState(115);
@@ -27,12 +29,15 @@ const App = () => {
   }, [congressNumber]);
 
   return (
+    // React state management go brrr
     <AppStateContext.Provider
       value={{
         congressNumber,
         setCongressNumber,
         graphData,
         setGraphData,
+        graphType,
+        setGraphType,
         chamber,
         setChamber,
         focusedMember,
@@ -40,7 +45,8 @@ const App = () => {
       }}
     >
       <>
-        <NavBar />
+        <Search />
+        <ControlPanel />
         <Graph />
       </>
     </AppStateContext.Provider>

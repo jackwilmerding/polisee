@@ -60,6 +60,35 @@ const Graph = () => {
           )}
         </div>
       )}
+      <div className="btn-group graph-viewmode-selector">
+        <button
+          type="button"
+          className={
+            graphType === "2D" ? "btn btn-primary" : "btn btn-outline-primary"
+          }
+          onClick={() => setGraphType("2D")}
+        >
+          2D
+        </button>
+        <button
+          type="button"
+          className={
+            graphType === "3D" ? "btn btn-primary" : "btn btn-outline-primary"
+          }
+          onClick={() => setGraphType("3D")}
+        >
+          3D
+        </button>
+        <button
+          type="button"
+          className={
+            graphType === "VR" ? "btn btn-primary" : "btn btn-outline-primary"
+          }
+          onClick={() => setGraphType("VR")}
+        >
+          VR
+        </button>
+      </div>
     </>
   );
 };

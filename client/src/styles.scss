@@ -42,3 +42,10 @@ html {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.graph-viewmode-selector {
+  position: fixed;
+  left: 4pt;
+  bottom: 20pt;
+  z-index: 1000;
+}

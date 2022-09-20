@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import loadCongress from "../scripts/loadCongress";
 import Graph from "./Graph";
-import NavBar from "./Navbar";
+import NavBar from "./NavBar";
 
 export const AppStateContext = React.createContext({});
 

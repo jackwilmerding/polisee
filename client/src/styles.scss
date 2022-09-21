@@ -56,7 +56,6 @@ html {
   left: 50%;
   transform: translate(-50%, 0);
   padding: 0 4pt 4pt 4pt;
-
   //backdrop-filter: blur(10px);
 
   width: min(100%, 400pt);
@@ -135,6 +134,7 @@ $control-center-radius: 25pt;
   //background-color: white;
   border-radius: $border-radius;
   backdrop-filter: blur(100px);
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.15);
   //backdrop-filter: brightness(100%);
 }
 

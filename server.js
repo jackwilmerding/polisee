@@ -10,7 +10,7 @@ dotenv.config();
 
 //javascripttttt
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
+console.log("URI: " + process.env.MONGO_URI)
 const client = new MongoClient(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
@@ -112,12 +112,23 @@ app.post("/api/congress/:congressNumber/search", async (req, res) => {
       {
         $search: {
           index: `${req.params.congressNumber}_search`,
-          text: {
-            query: text,
-            fuzzy: {},
-            path: {
-              wildcard: "*",
-            },
+          compound: {
+            should: [{
+                autocomplete: {
+                  query: text,
+                  fuzzy: {},
+                  path: "first_name",
+                },
+              },
+              {
+                autocomplete: {
+                  query: text,
+                  fuzzy: {},
+                  path: "last_name"
+                },
+              },
+            ],
+            minimumShouldMatch: 1,
           },
         },
       },

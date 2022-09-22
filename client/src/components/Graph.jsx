@@ -32,7 +32,7 @@ const Graph = () => {
       graphData: { nodes, links },
       nodeId: "_id",
       linkVisibility: false,
-      backgroundColor: "white",
+      backgroundColor: "#eaeaea",
       nodeColor: (node) => colorMap[node.party] || "green",
       nodeLabel: (node) => `${node.firstName} ${node.lastName}`,
       nodeVisibility: (node) => node.chamber === chamber,

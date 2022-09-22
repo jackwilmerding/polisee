@@ -116,14 +116,20 @@ app.post("/api/congress/:congressNumber/search", async (req, res) => {
             should: [{
                 autocomplete: {
                   query: text,
-                  fuzzy: {},
+                  fuzzy: {
+                    maxEdits: 1,
+                    maxExpansions: 10
+                  },
                   path: "first_name",
                 },
               },
               {
                 autocomplete: {
                   query: text,
-                  fuzzy: {},
+                  fuzzy: {
+                    maxEdits: 1,
+                    maxExpansions: 10
+                  },
                   path: "last_name"
                 },
               },

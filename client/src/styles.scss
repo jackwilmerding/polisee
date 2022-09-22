@@ -129,7 +129,7 @@ $control-center-radius: 25pt;
   //align-items: center;
   //border: 1px solid red;
   //border-radius: $border-radius;
-  background-color: #ffffffd0;
+  background-color: #F1F1F1d0;
   //border: 1px solid #eaeaea;
   //background-color: white;
   border-radius: $border-radius;
@@ -148,3 +148,12 @@ $control-center-radius: 25pt;
   justify-content: flex-end;
   align-items: center;
 }
+
+.form-control {
+  background-color: #F1F1F1d0;
+}
+
+.form-select {
+  background-color: #F1F1F1d0;
+}
+

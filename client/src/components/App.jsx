@@ -8,7 +8,7 @@ export const AppStateContext = React.createContext({});
 
 const App = () => {
   const [graphData, setGraphData] = useState(null);
-  const [graphType, setGraphType] = useState("3D");
+  const [graphType, setGraphType] = useState("2D");
 
   const [chamber, setChamber] = useState("house");
   const [congressNumber, setCongressNumber] = useState(115);

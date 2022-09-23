@@ -9,9 +9,10 @@ import { useContext, useEffect, useState } from "react";
 
 import { AppStateContext } from "./App";
 const colorMap = {
-  I: "gray",
-  D: "blue",
-  R: "red",
+  I: "#A56DF0",
+  D: "#3689D1",
+  R: "#EE8B8B",
+  L: "#DAC968"
 };
 
 const Graph = () => {
@@ -33,7 +34,7 @@ const Graph = () => {
       nodeId: "_id",
       linkVisibility: false,
       backgroundColor: "#eaeaea",
-      nodeColor: (node) => colorMap[node.party] || "green",
+      nodeColor: (node) => colorMap[node.party] || "#BBBBBB",
       nodeLabel: (node) => `${node.firstName} ${node.lastName}`,
       nodeVisibility: (node) => node.chamber === chamber,
       showNavInfo: false,

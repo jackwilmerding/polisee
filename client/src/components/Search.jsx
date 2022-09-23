@@ -3,7 +3,7 @@ import { useState, useContext } from "react";
 import { AppStateContext } from "./App";
 import searchMembers from "../scripts/searchMembers";
 
-const CONGRESSES = [115, 116, 117].sort();
+const CONGRESSES = [112, 113, 114, 115, 116].sort();
 
 const Search = () => {
   const { congressNumber, setCongressNumber } = useContext(AppStateContext);

@@ -50,6 +50,10 @@ html {
   flex-direction: column;
 }
 
+.search-container.btn-primary {
+  background: url("./graphics/search-button.svg")
+}
+
 .search-results-container {
   position: fixed;
   top: calc(4pt + $input-height + 4pt);
@@ -92,17 +96,18 @@ html {
   text-decoration: underline;
 }
 
-$control-center-radius: 25pt;
+$control-center-radius: 30pt;
 
 .control-center {
   position: fixed;
   z-index: 1001;
-  border-radius: $control-center-radius;
-  width: 2 * $control-center-radius;
-  height: 2 * $control-center-radius;
   color: white;
+  height: 2 * $control-center-radius;
+  width: 2 * $control-center-radius;
   //border: 1px solid black;
-  background-color: $primary;
+  background: url("./graphics/dome.svg");
+  background-repeat: no-repeat;
+  background-position: center;
   bottom: 4pt;
   left: 50%;
   transform: translate(-50%, 0);

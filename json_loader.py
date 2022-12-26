@@ -39,8 +39,8 @@ if __name__ == "__main__":
             "nodes": nodes,
             "edges": edges,
         }
-        with open(f"{congress_number}.json", "w") as json_file:
+        with open(f"./client/public/data/{congress_number}.json", "w") as json_file:
             json.dump(unified, json_file)
-        with open("index.json", "w") as json_file:
-            json.dump(members, json_file)
         print(f"Done with {congress_number}")
+    with open("./client/public/data/index.json", "w") as json_file:
+        json.dump(members, json_file)

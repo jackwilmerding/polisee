@@ -160,6 +160,8 @@ def clean_unpaired_ids(congress_number: int):
     }
     edges = db[str(congress_number) + "_edges"]
     nodes = db[str(congress_number) + "_nodes"]
+    n_docs = edges.count_documents({})
+    ctr = 0
     for edge in edges.find():
         node_document = nodes.find_one({"_id": edge["to_node"]})
         if node_document is None:
@@ -171,6 +173,9 @@ def clean_unpaired_ids(congress_number: int):
                         "sponsorships_this_congress": 0}
             nodes.insert_one(new_node)
             print("SUCCESS: Added missing member")
+            time.sleep(3)
+        ctr += 1
+        print(f"{ctr}/{n_docs}")
 
 
 # DONE
@@ -274,11 +279,6 @@ def fix_sponsorless_congress(congress_number: int):
 
 
 if __name__ == "__main__":
-    get_secrets("./secrets.txt")
-    get_congress_data(115)
-    db.drop_collection("116_nodes")
-    db.drop_collection("116_edges")
-    get_congress_data(116)
-    get_congress_data(114)
-    get_congress_data(113)
-    get_congress_data(112)
+    get_secrets("secrets.txt")
+    clean_unpaired_ids(112)
+    clean_unpaired_ids(113)

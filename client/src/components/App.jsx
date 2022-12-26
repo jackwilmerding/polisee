@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import loadCongress from "../scripts/loadCongress";
+import loadCongress from "../util/loadCongress";
 import Graph from "./Graph";
 import Search from "./Search";
 import ControlPanel from "./ControlPanel";

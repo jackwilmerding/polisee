@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 
 import { AppStateContext } from "./App";
-import searchMembers from "../scripts/searchMembers";
+import searchMembers from "../util/searchMembers";
 
 const CONGRESSES = [112, 113, 114, 115, 116].sort();
 

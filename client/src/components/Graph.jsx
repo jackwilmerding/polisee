@@ -1,8 +1,8 @@
 import {
   ForceGraph2D,
-  ForceGraph3D,
-  ForceGraphVR,
-  ForceGraphAR,
+  // ForceGraph3D,
+  // ForceGraphVR,
+  // ForceGraphAR,
 } from "react-force-graph";
 
 import { useContext, useEffect, useState } from "react";
@@ -12,7 +12,7 @@ const colorMap = {
   I: "#A56DF0",
   D: "#3689D1",
   R: "#EE8B8B",
-  L: "#DAC968"
+  L: "#DAC968",
 };
 
 const Graph = () => {
@@ -48,17 +48,7 @@ const Graph = () => {
         <div className="loading">Loading data...</div>
       ) : (
         <div style={{ position: "relative" }}>
-          {graphType === "2D" ? (
-            <ForceGraph2D {...graphProps(graphData, chamber)} />
-          ) : graphType === "3D" ? (
-            <ForceGraph3D {...graphProps(graphData, chamber)} />
-          ) : graphType === "VR" ? (
-            <ForceGraphVR {...graphProps(graphData, chamber)} />
-          ) : graphType === "AR" ? (
-            <ForceGraphAR {...graphProps(graphData, chamber)} />
-          ) : (
-            <></>
-          )}
+          <ForceGraph2D {...graphProps(graphData, chamber)} />
         </div>
       )}
     </>

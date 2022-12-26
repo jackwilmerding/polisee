@@ -1,20 +1,21 @@
 body,
 html {
   margin: 0;
-  font-family: 'nilland';
+  font-family: "nilland";
   background-color: #eaeaea;
 }
 
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 @font-face {
-  font-family: 'nilland';
-  src: url("./graphics/nilland/Nilland.ttf");
+  font-family: "nilland";
+  // src: url("../public/fonts/nilland/Nilland.ttf");
+  src: url("/fonts/nilland/Nilland.ttf");
 }
 
 @font-face {
-  font-family: 'roboto';
-  src: url("./graphics/roboto/roboto.ttf");
+  font-family: "roboto";
+  src: url("/fonts/roboto/roboto.ttf");
 }
 
 #root {
@@ -32,7 +33,7 @@ html {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-family: 'nilland';
+  font-family: "nilland";
 }
 
 .top-bar {
@@ -114,7 +115,7 @@ $control-center-radius: 30pt;
   height: 2 * $control-center-radius;
   width: 2 * $control-center-radius;
   //border: 1px solid black;
-  background-image: url("./graphics/dome.svg");
+  background-image: url("/graphics/dome.svg");
   background-repeat: no-repeat;
   background-position: center;
   bottom: 4pt;
@@ -127,7 +128,7 @@ $control-center-radius: 30pt;
 }
 
 .control-center:active {
-  filter: brightness(.5);
+  filter: brightness(0.5);
 }
 
 .control-panel {
@@ -147,14 +148,14 @@ $control-center-radius: 30pt;
   //align-items: center;
   //border: 1px solid red;
   //border-radius: $border-radius;
-  background-color: #F1F1F1d0;
+  background-color: #f1f1f1d0;
   //border: 1px solid #eaeaea;
   //background-color: white;
   border-radius: $border-radius;
   backdrop-filter: blur(100px);
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.15);
   //backdrop-filter: brightness(100%);
-  font-family: 'nilland';
+  font-family: "nilland";
 }
 
 .control-panel-footer {
@@ -169,10 +170,9 @@ $control-center-radius: 30pt;
 }
 
 .form-control {
-  background-color: #F1F1F1d0;
+  background-color: #f1f1f1d0;
 }
 
 .form-select {
-  background-color: #F1F1F1d0;
+  background-color: #f1f1f1d0;
 }
-

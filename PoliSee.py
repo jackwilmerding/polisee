@@ -1,6 +1,7 @@
 from requests import *
 import pymongo
 import time
+import json
 
 key = ""
 mongo = None
@@ -277,8 +278,34 @@ def fix_sponsorless_congress(congress_number: int):
         ctr += 1
         print(f"\rFixing nodes: {ctr}/{len(bills)} of the way there; {request_counter} requests", end="")
 
+def clean_unpaired_ids_json(congress_number: int):
+    params = {
+        "api_key": key,
+        "format": "json"
+    }
+    f = open(f"./client/public/data/{congress_number}.json", "r")
+    nodes = db[str(congress_number) + "_nodes"]
+    unified = json.load(f)
+    n_docs = len(unified["edges"])
+    ctr = 0
+    members = {}
+    for node in unified["nodes"]:
+        members[node["_id"]] = node
+    for edge in unified["edges"]:
+        if edge["to_node"] not in members:
+            member = get_until_success(f"https://api.congress.gov/v3/member/{edge['to_node']}", params)["member"]
+            print(f"Adding {member['firstName']} {member['lastName']}")
+            new_node = {"_id": edge["to_node"], "first_name": member["firstName"].upper(),
+                        "last_name": member["lastName"].upper(), "state": member["state"].upper(),
+                        "party": member["party"][:1].upper(), "chamber": edge["chamber"],
+                        "sponsorships_this_congress": 0}
+            nodes.insert_one(new_node)
+            print("SUCCESS: Added missing member")
+            time.sleep(3)
+        ctr += 1
+        print(f"{ctr}/{n_docs}")
 
 if __name__ == "__main__":
     get_secrets("secrets.txt")
-    clean_unpaired_ids(112)
-    clean_unpaired_ids(113)
+    clean_unpaired_ids_json(112)
+    clean_unpaired_ids_json(113)

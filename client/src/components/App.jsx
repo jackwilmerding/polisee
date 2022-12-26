@@ -20,6 +20,7 @@ const App = () => {
       `✅ UseEffect detected updated congress number: ${congressNumber}`
     );
     (async () => {
+      console.log("loading data...");
       setGraphData(null);
 
       const { nodes, links } = await loadCongress(congressNumber);

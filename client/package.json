@@ -7,13 +7,14 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "predeploy": "npm run build",
-    "deploy": "node scripts/deploy.js",
+    "predeploy": "npm run build && node scripts/predeploy.js",
+    "deploy": "gh-pages -d dist",
     "preview": "vite preview"
   },
   "dependencies": {
     "bootstrap": "^5.2.1",
     "bootstrap-icons": "^1.9.1",
+    "gh-pages": "^4.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-force-graph": "^1.41.14"
@@ -22,7 +23,6 @@
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.1.0",
-    "gh-pages": "^4.0.0",
     "sass": "^1.54.9",
     "vite": "^3.1.0"
   }

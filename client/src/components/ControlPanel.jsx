@@ -29,7 +29,7 @@ const ControlPanel = () => {
                   ? "btn btn-primary"
                   : "btn btn-outline-primary"
               }
-              onClick={() => setChamber("house")}
+              onClick={() => setChamber("House of Representatives")}
             >
               House
             </button>
@@ -40,7 +40,7 @@ const ControlPanel = () => {
                   ? "btn btn-primary"
                   : "btn btn-outline-primary"
               }
-              onClick={() => setChamber("senate")}
+              onClick={() => setChamber("Senate")}
             >
               Senate
             </button>

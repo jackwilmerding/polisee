@@ -28,14 +28,18 @@ const Graph = () => {
     if (!graphData || !chamber) return null;
 
     const nodes = graphData.nodes.filter((node) => node.chamber === chamber);
-    const links = graphData.links.filter((link) => link.chamber === chamber);
+    const links = graphData.links
+      .filter((link) => link.chamber === chamber)
+      .map((link) => {
+        return { source: link["to_node"], target: link["from_node"] };
+      });
     return {
       graphData: { nodes, links },
       nodeId: "_id",
       linkVisibility: false,
       backgroundColor: "#eaeaea",
       nodeColor: (node) => colorMap[node.party] || "#BBBBBB",
-      nodeLabel: (node) => `${node.firstName} ${node.lastName}`,
+      nodeLabel: (node) => `${node["first_name"]} ${node["last_name"]}`,
       nodeVisibility: (node) => node.chamber === chamber,
       showNavInfo: false,
       linkOpacity: 0.1,

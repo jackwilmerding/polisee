@@ -9,7 +9,16 @@ const loadCongress = async (congress) => {
     `✅ Loaded ${nodes.length} nodes and ${edges.length} edges in ${fetchTime}ms`
   );
 
-  return { nodes, links: edges };
+  return {
+    nodes,
+    links: edges.map((link) => {
+      return {
+        source: link["to_node"],
+        target: link["from_node"],
+        chamber: link.chamber,
+      };
+    }),
+  };
 };
 
 export default loadCongress;

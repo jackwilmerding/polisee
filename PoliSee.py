@@ -24,14 +24,23 @@ def get_secrets(filename: str):
         db = mongo.PoliSee
 
 
+def get_secrets_just_key(filename: str):
+    with open(filename) as file:
+        global key
+        key = file.readline().strip("\n")
+
+
 # DONE
 def get_until_success(endpoint, params):
+    get_secrets_just_key("secrets.txt")
     global request_counter
     request_counter += 1
+    params["api_key"] = key
+    params["format"] = "json"
     req = get(endpoint, params)
     while req.status_code != 200:
         print()
-        print(f"Error Fetching following endpoint: {endpoint}")
+        print(f"Error Fetching following endpoint: {endpoint}, {req.text}")
         time.sleep(300)
         req = get(endpoint, params)
     time.sleep(1.4)

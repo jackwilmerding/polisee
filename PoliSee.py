@@ -1,5 +1,5 @@
 from requests import *
-import pymongo
+# import pymongo
 import time
 import json
 
@@ -32,19 +32,24 @@ def get_secrets_just_key(filename: str):
 
 # DONE
 def get_until_success(endpoint, params):
-    get_secrets_just_key("secrets.txt")
-    global request_counter
-    request_counter += 1
-    params["api_key"] = key
-    params["format"] = "json"
-    req = get(endpoint, params)
-    while req.status_code != 200:
-        print()
-        print(f"Error Fetching following endpoint: {endpoint}, {req.text}")
-        time.sleep(300)
+    # get_secrets_just_key("secrets.txt")
+    try:
+        global request_counter
+        request_counter += 1
+        params["api_key"] = key
+        params["format"] = "json"
         req = get(endpoint, params)
-    time.sleep(1.4)
-    return req.json()
+        while req.status_code != 200:
+            print()
+            print(f"Error Fetching following endpoint: {endpoint}, {req.text}")
+            time.sleep(300)
+            req = get(endpoint, params)
+        time.sleep(1.4)
+        return req.json()
+    except:
+        print("network did an oopsie")
+        # tail recursion go brap brap
+        return get_until_success(endpoint, params)
 
 
 # DONE
@@ -60,7 +65,8 @@ def get_bills(congress_number):
     response = get_until_success(url, params)
     while len(response["bills"]) != 0:
         bills.extend(response["bills"])
-        print(f"\rFetching House bills: {params['offset']}/{response['pagination']['count']}", end="")
+        print(
+            f"\rFetching House bills: {params['offset']}/{response['pagination']['count']}", end="")
         params["offset"] += 250
         response = get_until_success(url, params)
     url = f"https://api.congress.gov/v3/bill/{congress_number}/s"
@@ -68,7 +74,8 @@ def get_bills(congress_number):
     response = get_until_success(url, params)
     while len(response["bills"]) != 0:
         bills.extend(response["bills"])
-        print(f"\rFetching Senate bills: {params['offset']}/{response['pagination']['count']}", end="")
+        print(
+            f"\rFetching Senate bills: {params['offset']}/{response['pagination']['count']}", end="")
         params["offset"] += 250
         response = get_until_success(url, params)
     return bills
@@ -77,11 +84,14 @@ def get_bills(congress_number):
 # DONE
 def update_edge(congress_number: int, from_node: str, to_node: str, chamber: str):
     collection = db[str(congress_number) + "_edges"]
-    edge_document = collection.find_one({"$and": [{"from_node": from_node}, {"to_node": to_node}, {"chamber": chamber}]})
+    edge_document = collection.find_one(
+        {"$and": [{"from_node": from_node}, {"to_node": to_node}, {"chamber": chamber}]})
     if edge_document is not None:
-        collection.update_one({"$and": [{"from_node": from_node}, {"to_node": to_node}, {"chamber": chamber}]}, {"$inc": {"count": 1}})
+        collection.update_one({"$and": [{"from_node": from_node}, {"to_node": to_node}, {
+                              "chamber": chamber}]}, {"$inc": {"count": 1}})
     else:
-        doc = {"_id": from_node + "," + to_node, "from_node": from_node, "to_node": to_node, "chamber": chamber, "count": 1}
+        doc = {"_id": from_node + "," + to_node, "from_node": from_node,
+               "to_node": to_node, "chamber": chamber, "count": 1}
         collection.insert_one(doc)
 
 
@@ -90,9 +100,11 @@ def update_node(congress_number: int, bioguide_id: str, first_name: str, last_na
     collection = db[str(congress_number) + "_nodes"]
     node_document = collection.find_one({"_id": bioguide_id})
     if node_document is not None:
-        collection.update_one({"_id": bioguide_id}, {"$inc": {"sponsorships_this_congress": 1}})
+        collection.update_one({"_id": bioguide_id}, {
+                              "$inc": {"sponsorships_this_congress": 1}})
     else:
-        doc = {"_id": bioguide_id, "first_name": first_name.upper(), "last_name": last_name.upper(), "state": state.upper(), "party": party[:1], "chamber": chamber, "sponsorships_this_congress": 1}
+        doc = {"_id": bioguide_id, "first_name": first_name.upper(), "last_name": last_name.upper(
+        ), "state": state.upper(), "party": party[:1], "chamber": chamber, "sponsorships_this_congress": 1}
         collection.insert_one(doc)
 
 
@@ -175,7 +187,8 @@ def clean_unpaired_ids(congress_number: int):
     for edge in edges.find():
         node_document = nodes.find_one({"_id": edge["to_node"]})
         if node_document is None:
-            member = get_until_success(f"https://api.congress.gov/v3/member/{edge['to_node']}", params)["member"]
+            member = get_until_success(
+                f"https://api.congress.gov/v3/member/{edge['to_node']}", params)["member"]
             print(f"Adding {member['firstName']} {member['lastName']}")
             new_node = {"_id": edge["to_node"], "first_name": member["firstName"].upper(),
                         "last_name": member["lastName"].upper(), "state": member["state"].upper(),
@@ -199,12 +212,14 @@ def augment_existing_nodes(congress_number: int):
     nodes.update_many({}, {"$set": {"aisle_crosses_this_congress": 0}})
     ctr = 0
     for node in nodes.find():
-        new_fields = {"cosponsorships_this_congress": get_num_cosponsorships(congress_number, node["_id"]), "aisle_crosses_this_congress": get_num_aisle_crosses(congress_number, node["_id"])}
+        new_fields = {"cosponsorships_this_congress": get_num_cosponsorships(
+            congress_number, node["_id"]), "aisle_crosses_this_congress": get_num_aisle_crosses(congress_number, node["_id"])}
         nodes.update_one({"_id": node["_id"]}, {"$set": new_fields})
         ctr += 0.5
         print(f"Augmented {ctr} nodes")
     for node in nodes.find():
-        member = get_until_success(f"https://api.congress.gov/v3/member/{node['_id']}", params)["member"]
+        member = get_until_success(
+            f"https://api.congress.gov/v3/member/{node['_id']}", params)["member"]
         new_fields = {"prolific_rank": get_prolific_rank(congress_number, node["_id"]),
                       "collaborative_rank": get_collaborative_rank(congress_number, node["_id"]),
                       "bipartisan_rank": get_bipartisan_rank(congress_number, node["_id"]),
@@ -222,12 +237,13 @@ def get_bill_info(bill: dict, congress_number: int):
     }
     bill_type = bill["type"].upper()
     bill_number = bill["number"]
-    current_sponsor = get_until_success(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}", params)["bill"]["sponsors"][0]
+    current_sponsor = get_until_success(
+        f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}", params)["bill"]["sponsors"][0]
     if bill_type == "S":
         current_sponsor["chamber"] = "Senate"
     elif bill_type == "HR":
         current_sponsor["chamber"] = "House of Representatives"
-    #Fixes J. Gresham Barrett-style names from just being J. Barrett
+    # Fixes J. Gresham Barrett-style names from just being J. Barrett
     if len(current_sponsor["firstName"]) == 2 and current_sponsor["firstName"][1] == ".":
         current_sponsor["firstName"] += current_sponsor["middleName"]
     params = {
@@ -253,12 +269,15 @@ def get_congress_data(congress_number: int):
     ctr = 0
     for bill in bills:
         ctr += 1
-        print(f"\rProcessing bills: {ctr}/{len(bills)}; {request_counter} requests", end="")
-        current_sponsor, current_cosponsors = get_bill_info(bill, congress_number)
+        print(
+            f"\rProcessing bills: {ctr}/{len(bills)}; {request_counter} requests", end="")
+        current_sponsor, current_cosponsors = get_bill_info(
+            bill, congress_number)
         for cosponsor in current_cosponsors:
             update_edge(congress_number, current_sponsor["bioguideId"], cosponsor["bioguideId"],
                         current_sponsor["chamber"])
-        update_node(congress_number, current_sponsor["bioguideId"], current_sponsor["firstName"], current_sponsor["lastName"], current_sponsor["state"], current_sponsor["party"], current_sponsor["chamber"])
+        update_node(congress_number, current_sponsor["bioguideId"], current_sponsor["firstName"],
+                    current_sponsor["lastName"], current_sponsor["state"], current_sponsor["party"], current_sponsor["chamber"])
     clean_unpaired_ids(congress_number)
     augment_existing_nodes(congress_number)
 
@@ -278,14 +297,18 @@ def fix_sponsorless_congress(congress_number: int):
     for bill in bills:
         bill_type = bill["type"].upper()
         bill_number = bill["number"]
-        current_sponsor = get_until_success(f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}", params)["bill"]["sponsors"][0]
+        current_sponsor = get_until_success(
+            f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}", params)["bill"]["sponsors"][0]
         current_node = nodes.find_one({"_id": current_sponsor["bioguideId"]})
         if current_node is None:
             continue
         current_sponsorships = current_node["sponsorships_this_congress"] + 1
-        nodes.update_one({"_id": current_sponsor["bioguideId"]}, {"$set": {"sponsorships_this_congress": current_sponsorships}})
+        nodes.update_one({"_id": current_sponsor["bioguideId"]}, {
+                         "$set": {"sponsorships_this_congress": current_sponsorships}})
         ctr += 1
-        print(f"\rFixing nodes: {ctr}/{len(bills)} of the way there; {request_counter} requests", end="")
+        print(
+            f"\rFixing nodes: {ctr}/{len(bills)} of the way there; {request_counter} requests", end="")
+
 
 def clean_unpaired_ids_json(congress_number: int):
     params = {
@@ -302,7 +325,8 @@ def clean_unpaired_ids_json(congress_number: int):
         members[node["_id"]] = node
     for edge in unified["edges"]:
         if edge["to_node"] not in members:
-            member = get_until_success(f"https://api.congress.gov/v3/member/{edge['to_node']}", params)["member"]
+            member = get_until_success(
+                f"https://api.congress.gov/v3/member/{edge['to_node']}", params)["member"]
             print(f"Adding {member['firstName']} {member['lastName']}")
             new_node = {"_id": edge["to_node"], "first_name": member["firstName"].upper(),
                         "last_name": member["lastName"].upper(), "state": member["state"].upper(),
@@ -313,6 +337,7 @@ def clean_unpaired_ids_json(congress_number: int):
             time.sleep(3)
         ctr += 1
         print(f"{ctr}/{n_docs}")
+
 
 if __name__ == "__main__":
     get_secrets("secrets.txt")

@@ -135,6 +135,33 @@ def get_congress_data(congress_number: int):
                 "sponsorships_this_congress": 0,
             }
             print(f"Added missing member {member['firstName']} {member['lastName']} from {member['state']} to {congress_number}th congress in the House")
+    for edge in senate_edges:
+        if edge["to_node"] not in senate_nodes:
+            member = get_until_success(f"https://api.congress.gov/v3/member/{edge['to_node']}", {})["member"]
+            senate_nodes[current_sponsor["bioguideId"]] = {
+                "_id": edge["to_node"],
+                "first_name": member["firstName"].upper(),
+                "last_name": member["lastName"].upper(),
+                "state": member["state"].upper(),
+                "party": member["party"][:1].upper(),
+                "image": member["depiction"]["imageUrl"],
+                "sponsorships_this_congress": 0,
+            }
+            print(f"Added missing member {member['firstName']} {member['lastName']} from {member['state']} to {congress_number}th congress in the senate")
+    # SAVES PROGRESS BEFORE CODE THAT COULD HAVE ERRORS IN IT
+    unified_house = {
+        "nodes": dict_to_list_no_keys(house_nodes),
+        "edges": dict_to_list_no_keys(house_edges),
+    }
+    unified_senate = {
+        "nodes": dict_to_list_no_keys(senate_nodes),
+        "edges": dict_to_list_no_keys(senate_edges),
+    }
+    with open(f"./client/public/data/{congress_number}_senate_intermediate.json", "w") as json_file:
+        json.dump(unified_senate, json_file)
+    with open(f"./client/public/data/{congress_number}_house_intermediate.json", "w") as json_file:
+        json.dump(unified_house, json_file)
+    # Redundancy go brap brap
     augment_existing_nodes(senate_nodes, senate_edges)
     augment_existing_nodes(house_nodes, house_edges)
     unified_house = {

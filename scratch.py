@@ -1,6 +1,7 @@
 import json
+from requests import get
+import time
 
-from PoliSee import get_until_success, get_bills, get_bill_info
 
 key = ""
 covered_congresses = [116]
@@ -10,6 +11,85 @@ def get_secrets(filename: str):
     with open(filename) as file:
         global key
         key = file.readline().strip("\n")
+
+
+def get_until_success(endpoint, params):
+    try:
+        params["api_key"] = key
+        params["format"] = "json"
+        req = get(endpoint, params)
+        while req.status_code != 200:
+            print()
+            print(f"Error Fetching following endpoint: {endpoint}, {req.text}")
+            time.sleep(300)
+            req = get(endpoint, params)
+        time.sleep(1.4)
+        return req.json()
+    except:
+        print("network did an oopsie")
+        # tail recursion go brap brap
+        return get_until_success(endpoint, params)
+
+
+def get_bills(congress_number):
+    params = {
+        "api_key": key,
+        "format": "json",
+        "offset": 0,
+        "limit": 250
+    }
+    bills = []
+    url = f"https://api.congress.gov/v3/bill/{congress_number}/hr"
+    response = get_until_success(url, params)
+    while len(response["bills"]) != 0:
+        bills.extend(response["bills"])
+        print(
+            f"\rFetching House bills: {params['offset']}/{response['pagination']['count']}", end="")
+        params["offset"] += 250
+        response = get_until_success(url, params)
+    url = f"https://api.congress.gov/v3/bill/{congress_number}/s"
+    params["offset"] = 0
+    response = get_until_success(url, params)
+    while len(response["bills"]) != 0:
+        bills.extend(response["bills"])
+        print(
+            f"\rFetching Senate bills: {params['offset']}/{response['pagination']['count']}", end="")
+        params["offset"] += 250
+        response = get_until_success(url, params)
+    return bills
+
+
+def get_bill_info(bill: dict, congress_number: int):
+    params = {
+        "api_key": key,
+        "format": "json"
+    }
+    bill_type = bill["type"].upper()
+    bill_number = bill["number"]
+    current_sponsor = get_until_success(
+        f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}", params)["bill"]["sponsors"][0]
+    if bill_type == "S":
+        current_sponsor["chamber"] = "Senate"
+    elif bill_type == "HR":
+        current_sponsor["chamber"] = "House of Representatives"
+    # Fixes J. Gresham Barrett-style names from just being J. Barrett
+    if len(current_sponsor["firstName"]) == 2 and current_sponsor["firstName"][1] == ".":
+        current_sponsor["firstName"] += current_sponsor["middleName"]
+    params = {
+        "api_key": key,
+        "format": "json",
+        "offset": 0,
+        "limit": 250
+    }
+    current_cosponsors = []
+    url = f"https://api.congress.gov/v3/bill/{congress_number}/{bill_type}/{bill_number}/cosponsors"
+    response = get_until_success(url, params)
+    while len(response["cosponsors"]) != 0:
+        current_cosponsors.extend(response["cosponsors"])
+        params["offset"] += 250
+        response = get_until_success(url, params)
+    return current_sponsor, current_cosponsors
+
 
 
 def dict_to_list_no_keys(original: dict):
